@@ -1,0 +1,50 @@
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  height: 100vh;
+}
+.container {
+  padding: 10px 15px 20px 15px;
+  width: 70%;
+  height: 70%;
+  background-color: white;
+}
+.actions {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 10px;
+}
+input {
+  flex: 1 1 auto;
+  height: 30px;
+  background-color: whitesmoke;
+  border-radius: 12px;
+  padding: 0 10px;
+}
+
+button {
+  flex: 1 1 auto;
+  height: 30px;
+  color: white;
+  background-color: blue;
+  border-radius: 12px;
+}
+
+.diver {
+  height: 1px;
+  background-color: gray;
+  width: 100%;
+  margin: 10px 0px;
+}
+.info-list {
+  height: 200px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 15px;
+  overflow-y: auto;
+}
