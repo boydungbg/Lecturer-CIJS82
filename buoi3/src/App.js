@@ -1,74 +1,74 @@
+import { useState } from "react";
 import Task from "./components/task/task";
+import { get, save } from "./repositories/TodoRepository";
 
 function App() {
-  /// Litst data
-  let array = [
-    {
-      status: true,
-      title: "Làm việc nhà",
-    },
-    {
-      status: true,
-      title: "Làm việc nhà",
-    },
-    {
-      status: true,
-      title: "Làm việc nhà",
-    },
-    {
-      status: true,
-      title: "Làm việc nhà",
-    },
-    {
-      status: true,
-      title: "Làm việc nhà",
-    },
-    {
-      status: true,
-      title: "Làm việc nhà",
-    },
-    {
-      status: true,
-      title: "Làm việc nhà",
-    },
-    {
-      status: true,
-      title: "Làm việc nhà",
-    },
-  ];
+  const [todos, setTodos] = useState(get());
+  const [title, setTitle] = useState("");
+  const onSubmit = (title) => {
+    let newTodos = [
+      {
+        title: title,
+        status: false,
+      },
+      ...(todos ?? []),
+    ];
+    setTodos(newTodos);
+    save(newTodos);
+    setTitle("");
+  };
+
+  const onChangeTitle = (value) => {
+    setTitle(value);
+  };
+
+  const onCompleted = ({ title, status }) => {
+    console.log(title, status);
+    let newTodos = todos.map((todo) => {
+      if (todo.title === title) {
+        todo.status = status;
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+  };
+
   return (
-    <div
-      className="flex h-[100vh] justify-center items-center"
-      onClick={(e) => {
-        console.log("click");
-      }}
-    >
-      <div className="mx-auto w-2/4 bg-white h-[500px] p-6">
+    <div className="flex h-[100vh] justify-center items-center">
+      <div className="mx-auto w-2/4 bg-white  p-6">
         <div className="w-full">
           <form
             onSubmit={(e) => {
               e.preventDefault();
+              onSubmit(title);
             }}
           >
             <input
               type="text"
               placeholder="Enter your task here..."
               className="h-[40px] px-2 w-full border-b-2 border-neutral-950 outline-0"
+              value={title}
               onChange={(e) => {
-                console.log(e.target.value);
+                onChangeTitle(e.target.value);
               }}
             />
           </form>
         </div>
-        <div className="flex flex-col mt-4 mb-8">
+        <div className="flex flex-col h-[500px] overflow-auto mt-4 mb-8">
           {/* Render List data */}
-          {array.map((value) => (
+          {todos?.map((value, index) => (
             // binding data to component
-            <Task status={value.status} title={value.title} />
+            <Task
+              key={index}
+              status={value.status}
+              title={value.title}
+              todos={todos}
+              onCompleted={onCompleted}
+            />
           ))}
         </div>
         <div className="flex justify-between items-center">
-          <div className="text-2xl">{5} Tasks</div>
+          <div className="text-2xl">{todos?.length ?? 0} Tasks</div>
           <div className="text-2xl">Todo app</div>
         </div>
       </div>

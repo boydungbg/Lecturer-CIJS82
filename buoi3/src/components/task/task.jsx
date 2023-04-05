@@ -1,6 +1,6 @@
 import React from "react";
 
-const Task = ({ status, title, id, onDelete, onCompleted }) => {
+const Task = ({ status, title, id, onDelete, onCompleted, todos }) => {
   return (
     <div className="flex justify-start items-center my-4">
       <div className="rounded-full w-[20px] h-[20px] overflow-hidden border border-neutral-400">
@@ -12,11 +12,17 @@ const Task = ({ status, title, id, onDelete, onCompleted }) => {
             e.stopPropagation();
           }}
           onChange={(e) => {
-            console.log(e.target.value);
+            onCompleted({ title: title, status: e.target.checked });
           }}
         />
       </div>
-      <div className="pl-6 text-lg text-stone-950	">{title}</div>
+      <div
+        className={`pl-6 text-lg text-stone-950 ${
+          status ? "line-through decoration-4" : ""
+        }`}
+      >
+        {title}
+      </div>
     </div>
   );
 };
