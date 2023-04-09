@@ -1,5 +1,7 @@
 import { useState } from "react";
-import Task from "./components/task/task";
+import Footer from "./components/Footer";
+import Input from "./components/input/input";
+import TaskList from "./components/TaskList/TaskList";
 import { get, save } from "./repositories/TodoRepository";
 
 function App() {
@@ -22,8 +24,7 @@ function App() {
     setTitle(value);
   };
 
-  const onCompleted = ({ title, status }) => {
-    console.log(title, status);
+  const onCompleteTask = ({ title, status }) => {
     let newTodos = todos.map((todo) => {
       if (todo.title === title) {
         todo.status = status;
@@ -31,6 +32,12 @@ function App() {
       return todo;
     });
     setTodos(newTodos);
+  };
+
+  const onDeleteTask = (index) => {
+    todos.splice(index, 1);
+    setTodos([...todos]);
+    save(todos);
   };
 
   return (
@@ -43,34 +50,15 @@ function App() {
               onSubmit(title);
             }}
           >
-            <input
-              type="text"
-              placeholder="Enter your task here..."
-              className="h-[40px] px-2 w-full border-b-2 border-neutral-950 outline-0"
-              value={title}
-              onChange={(e) => {
-                onChangeTitle(e.target.value);
-              }}
-            />
+            <Input onChangeInput={onChangeTitle} value={title} />
           </form>
         </div>
-        <div className="flex flex-col h-[500px] overflow-auto mt-4 mb-8">
-          {/* Render List data */}
-          {todos?.map((value, index) => (
-            // binding data to component
-            <Task
-              key={index}
-              status={value.status}
-              title={value.title}
-              todos={todos}
-              onCompleted={onCompleted}
-            />
-          ))}
-        </div>
-        <div className="flex justify-between items-center">
-          <div className="text-2xl">{todos?.length ?? 0} Tasks</div>
-          <div className="text-2xl">Todo app</div>
-        </div>
+        <TaskList
+          todos={todos}
+          onCompleteTask={onCompleteTask}
+          onDeleteTask={onDeleteTask}
+        />
+        <Footer countTodo={todos?.length} />
       </div>
     </div>
   );
