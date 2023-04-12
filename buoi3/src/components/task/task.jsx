@@ -1,8 +1,20 @@
 import React, { useState } from "react";
 import Input from "../input/input";
 
-const Task = ({ status, title, id, onDeleteTask, onCompleteTask, todos }) => {
+const Task = ({
+  status,
+  title,
+  id,
+  onDeleteTask,
+  onCompleteTask,
+  onEditTask,
+}) => {
   const [isEdit, setIsEdit] = useState(false);
+  const [titleEdit, setTitleEdit] = useState(title);
+  const handleOnEditTask = () => {
+    onEditTask(id, titleEdit);
+    setIsEdit(false);
+  };
 
   return (
     <div className="flex justify-start items-center my-4">
@@ -15,7 +27,7 @@ const Task = ({ status, title, id, onDeleteTask, onCompleteTask, todos }) => {
             e.stopPropagation();
           }}
           onChange={(e) => {
-            onCompleteTask({ title: title, status: e.target.checked });
+            onCompleteTask(id);
           }}
         />
       </div>
@@ -31,9 +43,21 @@ const Task = ({ status, title, id, onDeleteTask, onCompleteTask, todos }) => {
           </div>
         ) : (
           /// nếu là edit task == true thì hiển thị ô input
-          <React.Fragment>
-            <Input />
-          </React.Fragment>
+          <div className="w-full ml-5">
+            <form
+              action=""
+              onSubmit={() => {
+                handleOnEditTask();
+              }}
+            >
+              <Input
+                value={titleEdit}
+                onChangeInput={(value) => {
+                  setTitleEdit(value);
+                }}
+              />
+            </form>
+          </div>
         )}
         {isEdit ? null : (
           <div>

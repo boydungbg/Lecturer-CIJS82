@@ -3,6 +3,7 @@ import Footer from "./components/Footer";
 import Input from "./components/input/input";
 import TaskList from "./components/TaskList/TaskList";
 import { get, save } from "./repositories/TodoRepository";
+const { v4: uuidv4 } = require("uuid");
 
 function App() {
   const [todos, setTodos] = useState(get());
@@ -10,6 +11,7 @@ function App() {
   const onSubmit = (title) => {
     let newTodos = [
       {
+        id: uuidv4(),
         title: title,
         status: false,
       },
@@ -24,20 +26,33 @@ function App() {
     setTitle(value);
   };
 
-  const onCompleteTask = ({ title, status }) => {
-    let newTodos = todos.map((todo) => {
-      if (todo.title === title) {
-        todo.status = status;
-      }
-      return todo;
-    });
-    setTodos(newTodos);
-  };
-
-  const onDeleteTask = (index) => {
-    todos.splice(index, 1);
+  const onCompleteTask = (taskId) => {
+    // Tìm index của task trong mảng todos thông qua taskid
+    let indexExist = todos.findIndex(({ id }) => id === taskId);
+    todos[indexExist] = {
+      ...todos[indexExist],
+      status: !todos[indexExist].status,
+    };
     setTodos([...todos]);
     save(todos);
+  };
+
+  const onDeleteTask = (taskId) => {
+    let indexExist = todos.findIndex(({ id }) => id === taskId);
+    todos.splice(indexExist, 1);
+    setTodos([...todos]);
+    save(todos);
+  };
+
+  const onEditTask = (taskId, title) => {
+    // Tìm index của task trong mảng todos thông qua taskid
+    let indexExist = todos.findIndex(({ id }) => id === taskId);
+    todos[indexExist] = {
+      ...todos[indexExist],
+      title: title,
+    };
+    save(todos);
+    setTodos([...todos]);
   };
 
   return (
@@ -57,6 +72,7 @@ function App() {
           todos={todos}
           onCompleteTask={onCompleteTask}
           onDeleteTask={onDeleteTask}
+          onEditTask={onEditTask}
         />
         <Footer countTodo={todos?.length} />
       </div>
