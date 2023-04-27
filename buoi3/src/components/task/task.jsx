@@ -1,18 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Input from "../input/input";
+import AppContext from "../../context/AppContext";
 
-const Task = ({
-  status,
-  title,
-  id,
-  onDeleteTask,
-  onCompleteTask,
-  onEditTask,
-}) => {
+const Task = ({ status, title, id }) => {
+  const { onCompleteTodo, onDeleteTodo, onEditTodo } = useContext(AppContext);
   const [isEdit, setIsEdit] = useState(false);
   const [titleEdit, setTitleEdit] = useState(title);
   const handleOnEditTask = () => {
-    onEditTask(id, titleEdit);
+    onEditTodo(id, titleEdit);
     setIsEdit(false);
   };
 
@@ -27,7 +22,7 @@ const Task = ({
             e.stopPropagation();
           }}
           onChange={(e) => {
-            onCompleteTask(id);
+            onCompleteTodo(id);
           }}
         />
       </div>
@@ -71,7 +66,7 @@ const Task = ({
             </button>
             <button
               onClick={() => {
-                onDeleteTask(id);
+                onDeleteTodo(id);
               }}
             >
               xóa

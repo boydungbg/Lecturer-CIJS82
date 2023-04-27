@@ -1,4 +1,4 @@
-function Input({ onChangeInput, value, placeholder, label, id }) {
+function Input({ onChangeInput, value, placeholder, label, id, reff }) {
   return (
     <div>
       {label && <label htmlFor={id}>{label}</label>}
@@ -8,8 +8,9 @@ function Input({ onChangeInput, value, placeholder, label, id }) {
         placeholder={placeholder}
         className="h-[40px] px-2 w-full border-b-2 border-neutral-950 outline-0"
         value={value}
+        ref={reff}
         onChange={(e) => {
-          onChangeInput(e.target.value);
+          onChangeInput && onChangeInput(e.target.value);
         }}
       />
     </div>

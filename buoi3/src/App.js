@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import AppContext from "./context/AppContext";
+import { get, save } from "./repositories/TodoRepository";
 // import HomePage from "./pages";
 const Home = React.lazy(() => import("./pages"));
 const Login = React.lazy(() => import("./pages/login.js"));
 const Register = React.lazy(() => import("./pages/register.js"));
+const { v4: uuidv4 } = require("uuid");
 
 // Tạo các router cho các trang
 const routes = createBrowserRouter([
@@ -34,8 +37,68 @@ const routes = createBrowserRouter([
 ]);
 
 function App() {
+  const [todos, setTodos] = useState();
+
+  useEffect(() => {
+    setTodos(get());
+  }, []);
+
+  const onAddTodo = (title) => {
+    let newTodos = [
+      {
+        id: uuidv4(),
+        title: title,
+        status: false,
+      },
+      ...(todos ?? []),
+    ];
+    setTodos(newTodos);
+    save(newTodos);
+  };
+
+  const onCompleteTodo = (taskId) => {
+    // Tìm index của task trong mảng todos thông qua taskid
+    let indexExist = todos.findIndex(({ id }) => id === taskId);
+    todos[indexExist] = {
+      ...todos[indexExist],
+      status: !todos[indexExist].status,
+    };
+    setTodos([...todos]);
+    save(todos);
+  };
+
+  const onDeleteTodo = (taskId) => {
+    let indexExist = todos.findIndex(({ id }) => id === taskId);
+    todos.splice(indexExist, 1);
+    setTodos([...todos]);
+    save(todos);
+  };
+
+  const onEditTodo = (taskId, title) => {
+    // Tìm index của task trong mảng todos thông qua taskid
+    let indexExist = todos.findIndex(({ id }) => id === taskId);
+    todos[indexExist] = {
+      ...todos[indexExist],
+      title: title,
+    };
+    save(todos);
+    setTodos([...todos]);
+  };
+
   // Khỏi tạo router provider chuyền routes vừa được khởi tạo
-  return <RouterProvider router={routes} />;
+  return (
+    <AppContext.Provider
+      value={{
+        todos: todos,
+        onAddTodo: onAddTodo,
+        onCompleteTodo: onCompleteTodo,
+        onDeleteTodo: onDeleteTodo,
+        onEditTodo: onEditTodo,
+      }}
+    >
+      <RouterProvider router={routes} />
+    </AppContext.Provider>
+  );
 }
 
 // let data = 123;

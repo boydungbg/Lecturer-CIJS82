@@ -1,7 +1,6 @@
 const Key = "Todos";
 
 const save = (data) => {
-  console.log(data);
   localStorage.setItem(Key, JSON.stringify(data));
 };
 

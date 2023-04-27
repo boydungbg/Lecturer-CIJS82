@@ -1,65 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Footer from "../components/Footer";
 import Input from "../components/input/input";
 import TaskList from "../components/TaskList/TaskList";
-import { get, save } from "../repositories/TodoRepository";
 import { useNavigate } from "react-router-dom";
+import AppContext from "../context/AppContext";
 const { v4: uuidv4 } = require("uuid");
 
 function HomePage() {
-  const [todos, setTodos] = useState();
+  const { onAddTodo } = useContext(AppContext);
   const [title, setTitle] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setTodos(get());
-  }, []);
-
-  const onSubmit = (title) => {
-    let newTodos = [
-      {
-        id: uuidv4(),
-        title: title,
-        status: false,
-      },
-      ...(todos ?? []),
-    ];
-    setTodos(newTodos);
-    save(newTodos);
-    setTitle("");
-  };
-
   const onChangeTitle = (value) => {
     setTitle(value);
-  };
-
-  const onCompleteTask = (taskId) => {
-    // Tìm index của task trong mảng todos thông qua taskid
-    let indexExist = todos.findIndex(({ id }) => id === taskId);
-    todos[indexExist] = {
-      ...todos[indexExist],
-      status: !todos[indexExist].status,
-    };
-    setTodos([...todos]);
-    save(todos);
-  };
-
-  const onDeleteTask = (taskId) => {
-    let indexExist = todos.findIndex(({ id }) => id === taskId);
-    todos.splice(indexExist, 1);
-    setTodos([...todos]);
-    save(todos);
-  };
-
-  const onEditTask = (taskId, title) => {
-    // Tìm index của task trong mảng todos thông qua taskid
-    let indexExist = todos.findIndex(({ id }) => id === taskId);
-    todos[indexExist] = {
-      ...todos[indexExist],
-      title: title,
-    };
-    save(todos);
-    setTodos([...todos]);
   };
 
   const handleLogout = () => {
@@ -77,7 +30,8 @@ function HomePage() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              onSubmit(title);
+              onAddTodo(title);
+              setTitle("");
             }}
           >
             <Input
@@ -87,13 +41,8 @@ function HomePage() {
             />
           </form>
         </div>
-        <TaskList
-          todos={todos}
-          onCompleteTask={onCompleteTask}
-          onDeleteTask={onDeleteTask}
-          onEditTask={onEditTask}
-        />
-        <Footer countTodo={todos?.length} />
+        <TaskList />
+        <Footer />
       </div>
     </div>
   );
