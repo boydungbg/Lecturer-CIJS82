@@ -2,6 +2,7 @@ import { Link, useNavigate, useNavigation } from "react-router-dom";
 import Input from "../components/input/input";
 import { useRef } from "react";
 import { saveUser } from "../repositories/UserRepository";
+import { createUser } from "../services/users";
 
 function Register() {
   const navigate = useNavigate();
@@ -26,13 +27,24 @@ function Register() {
       console.log("Mat khau confirm khong dung");
       return;
     }
-    saveUser({
-      user_name: userNameRef.current.value,
+    // saveUser({
+    //   user_name: userNameRef.current.value,
+    //   full_name: fullNameRef.current.value,
+    //   phone_number: phoneRef.current.value,
+    //   password: passwordRef.current.value,
+    // });
+    createUser({
       full_name: fullNameRef.current.value,
-      phone_number: phoneRef.current.value,
+      user_name: userNameRef.current.value,
       password: passwordRef.current.value,
-    });
-    navigate("/sign-in");
+      phone: phoneRef.current.value,
+    })
+      .then(() => {
+        navigate("/sign-in");
+      })
+      .catch((err) => {
+        console.log("Loi he thong xay ra" + err);
+      });
   };
   return (
     <div>
