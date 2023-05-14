@@ -12,4 +12,14 @@ const addTodo = async (data) => {
   return await axios.post(`${API_DOMAIN}/users/${userId}/todos`, data);
 };
 
-export { getTodos, addTodo };
+const editTodo = async (todoId, data) => {
+  const userId = localStorage.getItem("user_token");
+  return await axios.put(`${API_DOMAIN}/users/${userId}/todos/${todoId}`, data);
+};
+
+const deleteTodo = async (todoId) => {
+  const userId = localStorage.getItem("user_token");
+  return await axios.delete(`${API_DOMAIN}/users/${userId}/todos/${todoId}`);
+};
+
+export { getTodos, addTodo, editTodo, deleteTodo };

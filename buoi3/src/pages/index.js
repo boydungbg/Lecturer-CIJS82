@@ -16,6 +16,7 @@ function HomePage() {
 
   const handleLogout = () => {
     // logic hendleLogout
+    localStorage.clear();
     navigate("/sign-in");
   };
 

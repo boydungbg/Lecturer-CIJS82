@@ -1,51 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  BrowserRouter,
+  HashRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 import AppContext from "./context/AppContext";
-import { get, save } from "./repositories/TodoRepository";
-import { addTodo, getTodos } from "./services/todos";
-// import HomePage from "./pages";
-const Home = React.lazy(() => import("./pages"));
-const Login = React.lazy(() => import("./pages/login.js"));
-const Register = React.lazy(() => import("./pages/register.js"));
-const { v4: uuidv4 } = require("uuid");
+import { addTodo, deleteTodo, editTodo, getTodos } from "./services/todos";
+import HomePage from "./pages";
+import LoginPage from "./pages/login";
+import RegisterPage from "./pages/register";
 
-// Tạo các router cho các trang
-const routes = createBrowserRouter([
-  {
-    path: "/",
-    Component: () => (
-      <React.Suspense>
-        <Home />
-      </React.Suspense>
-    ),
-  },
-  {
-    path: "/sign-in",
-    Component: () => (
-      <React.Suspense>
-        <Login />
-      </React.Suspense>
-    ),
-  },
-  {
-    path: "/sign-up",
-    Component: () => (
-      <React.Suspense>
-        <Register />
-      </React.Suspense>
-    ),
-  },
-]);
+const PrivateRouter = ({ children }) => {
+  if (!localStorage.getItem("user_token")) {
+    return <Navigate to={"/sign-in"}></Navigate>;
+  }
+  return children;
+};
+const PublicRouter = ({ children }) => {
+  if (localStorage.getItem("user_token")) {
+    return <Navigate to={"/"}></Navigate>;
+  }
+  return children;
+};
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     const userId = localStorage.getItem("user_token");
     getTodos(userId).then(({ data }) => {
       setTodos(data);
     });
-  }, []);
+  }, [user]);
 
   const onAddTodo = (title) => {
     let newTodos = [
@@ -69,15 +58,15 @@ function App() {
       ...todos[indexExist],
       status: !todos[indexExist].status,
     };
-    // setTodos([...todos]);
-    // save(todos);
+    setTodos([...todos]);
+    editTodo(taskId, todos[indexExist]);
   };
 
   const onDeleteTodo = (taskId) => {
     let indexExist = todos.findIndex(({ id }) => id === taskId);
     todos.splice(indexExist, 1);
-    // setTodos([...todos]);
-    // save(todos);
+    deleteTodo(taskId);
+    setTodos([...todos]);
   };
 
   const onEditTodo = (taskId, title) => {
@@ -87,8 +76,9 @@ function App() {
       ...todos[indexExist],
       title: title,
     };
+    editTodo(taskId, todos[indexExist]);
+    setTodos([...todos]);
     // save(todos);
-    // setTodos([...todos]);
   };
 
   // Khỏi tạo router provider chuyền routes vừa được khởi tạo
@@ -96,160 +86,44 @@ function App() {
     <AppContext.Provider
       value={{
         todos: todos,
+        user: user,
+        setUser: setUser,
         onAddTodo: onAddTodo,
         onCompleteTodo: onCompleteTodo,
         onDeleteTodo: onDeleteTodo,
         onEditTodo: onEditTodo,
       }}
     >
-      <RouterProvider router={routes} />
+      <BrowserRouter basename="/CIJS182">
+        <Routes>
+          <Route
+            path="/"
+            Component={() => (
+              <PrivateRouter>
+                <HomePage />
+              </PrivateRouter>
+            )}
+          ></Route>
+          <Route
+            path="/sign-in"
+            Component={() => (
+              <PublicRouter>
+                <LoginPage />
+              </PublicRouter>
+            )}
+          ></Route>
+          <Route
+            path="/sign-up"
+            Component={() => (
+              <PublicRouter>
+                <RegisterPage />
+              </PublicRouter>
+            )}
+          ></Route>
+        </Routes>
+      </BrowserRouter>
     </AppContext.Provider>
   );
 }
-
-// let data = 123;
-// function App() {
-//   const [count, setCount] = useState(0);
-//   const [isShow, setIsShow] = useState(true);
-
-//   useEffect(() => {
-//     console.log("Init count = 10");
-//     setCount(10);
-//   }, []);
-
-//   useEffect(() => {
-//     console.log("data * 2");
-//     data = data + 2;
-//     console.log(data);
-//   }, [count]);
-
-//   return (
-//     <div>
-//       <div>{count}</div>
-//       {isShow ? <TextCompoment>Dung dep zai</TextCompoment> : <></>}
-//       <div
-//         onClick={() => {
-//           setCount(count + 1);
-//         }}
-//       >
-//         Increase
-//       </div>
-//       <div
-//         onClick={() => {
-//           setIsShow(!isShow);
-//         }}
-//       >
-//         Disable
-//       </div>
-//     </div>
-//   );
-// }
-
-// function TextCompoment() {
-//   useEffect(() => {
-//     return () => {
-//       console.log("Trước khi tôi làm gì đó đừng tắt đèn");
-//     };
-//   }, []);
-//   return <div>Show text</div>;
-// }
-
-// class App extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       count: 0,
-//       isShowComponentText: true,
-//     };
-//   }
-
-//   // componentWillMount() {
-//   //   console.log("will mount");
-//   // }
-
-//   // componentDidMount() {
-//   //   console.log("did mount");
-//   // }
-
-//   render() {
-//     console.log("app render");
-//     console.log(this.state.isShowComponentText);
-//     if (this.state.isShowComponentText) {
-//       console.log("Hien component");
-//     } else {
-//       console.log("An component");
-//     }
-//     return (
-//       <div>
-//         Hello
-//         {this.state.isShowComponentText ? (
-//           <TextComponent
-//             count={this.state.count}
-//             setStateApp={() => {
-//               this.setState({
-//                 count: 0,
-//               });
-//             }}
-//           />
-//         ) : (
-//           <></>
-//         )}
-//         <button
-//           onClick={() => {
-//             this.setState({
-//               count: this.state.count + 1,
-//             });
-//           }}
-//         >
-//           Count+
-//         </button>
-//         <button
-//           onClick={() => {
-//             this.setState({
-//               ...this.state,
-//               isShowComponentText: !this.state.isShowComponentText,
-//             });
-//           }}
-//         >
-//           An component
-//         </button>
-//       </div>
-//     );
-//   }
-// }
-
-// class TextComponent extends React.Component {
-//   constructor(props) {
-//     super(props);
-//   }
-
-//   componentWillReceiveProps(props) {
-//     console.log("Text component componentWillReceiveProps");
-//   }
-
-//   shouldComponentUpdate(nextProp) {
-//     console.log(nextProp.count);
-//     console.log("Text component shouldComponentUpdate");
-//     return nextProp.count % 2 == 0;
-//   }
-
-//   componentWillUpdate() {
-//     console.log("Text component componentWillUpdate");
-//   }
-
-//   componentDidUpdate() {
-//     console.log("Text component componentDidUpdate");
-//   }
-
-//   componentWillUnmount() {
-//     this.props.setStateApp();
-//     console.log("Text component componentWillUnmount");
-//   }
-
-//   render() {
-//     console.log("Text component render");
-//     return <div>Day la compoent text {this.props.count}</div>;
-//   }
-// }
 
 export default App;

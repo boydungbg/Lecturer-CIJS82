@@ -1,12 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/input/input";
 import { getUser } from "../services/users";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
+import AppContext from "../context/AppContext";
 
 function Login() {
   const userNameRef = useRef();
   const passwordRef = useRef();
   const navigate = useNavigate();
+  const { setUser } = useContext(AppContext);
 
   const onHandelSignIn = (e) => {
     e.preventDefault();
@@ -22,6 +24,7 @@ function Login() {
           data[0].password === passwordRef.current.value
         ) {
           localStorage.setItem("user_token", data[0].id);
+          setUser(data[0]);
           navigate("/");
         } else {
           console.error("Ten tai khoan hoac mat khau ko dung");

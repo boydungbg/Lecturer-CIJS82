@@ -10,7 +10,7 @@ const TaskList = () => {
       {todos?.map((value, index) => (
         // binding data to component
         <Task
-          key={value.id}
+          key={index}
           id={value.id}
           status={value.status}
           title={value.title}
