@@ -4,7 +4,6 @@ import Input from "../components/input/input";
 import TaskList from "../components/TaskList/TaskList";
 import { useNavigate } from "react-router-dom";
 import AppContext from "../context/AppContext";
-const { v4: uuidv4 } = require("uuid");
 
 function HomePage() {
   const { onAddTodo } = useContext(AppContext);

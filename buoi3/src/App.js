@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AppContext from "./context/AppContext";
 import { get, save } from "./repositories/TodoRepository";
+import { addTodo, getTodos } from "./services/todos";
 // import HomePage from "./pages";
 const Home = React.lazy(() => import("./pages"));
 const Login = React.lazy(() => import("./pages/login.js"));
@@ -37,23 +38,28 @@ const routes = createBrowserRouter([
 ]);
 
 function App() {
-  const [todos, setTodos] = useState();
+  const [todos, setTodos] = useState([]);
 
   useEffect(() => {
-    setTodos(get());
+    const userId = localStorage.getItem("user_token");
+    getTodos(userId).then(({ data }) => {
+      setTodos(data);
+    });
   }, []);
 
   const onAddTodo = (title) => {
     let newTodos = [
       {
-        id: uuidv4(),
         title: title,
         status: false,
       },
       ...(todos ?? []),
     ];
+    addTodo({
+      title: title,
+      status: false,
+    });
     setTodos(newTodos);
-    save(newTodos);
   };
 
   const onCompleteTodo = (taskId) => {
@@ -63,15 +69,15 @@ function App() {
       ...todos[indexExist],
       status: !todos[indexExist].status,
     };
-    setTodos([...todos]);
-    save(todos);
+    // setTodos([...todos]);
+    // save(todos);
   };
 
   const onDeleteTodo = (taskId) => {
     let indexExist = todos.findIndex(({ id }) => id === taskId);
     todos.splice(indexExist, 1);
-    setTodos([...todos]);
-    save(todos);
+    // setTodos([...todos]);
+    // save(todos);
   };
 
   const onEditTodo = (taskId, title) => {
@@ -81,8 +87,8 @@ function App() {
       ...todos[indexExist],
       title: title,
     };
-    save(todos);
-    setTodos([...todos]);
+    // save(todos);
+    // setTodos([...todos]);
   };
 
   // Khỏi tạo router provider chuyền routes vừa được khởi tạo

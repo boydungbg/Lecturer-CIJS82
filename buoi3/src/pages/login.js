@@ -21,6 +21,7 @@ function Login() {
           data[0].user_name === userNameRef.current.value &&
           data[0].password === passwordRef.current.value
         ) {
+          localStorage.setItem("user_token", data[0].id);
           navigate("/");
         } else {
           console.error("Ten tai khoan hoac mat khau ko dung");

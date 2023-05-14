@@ -3,7 +3,6 @@ const Key = "Users";
 const saveUser = (data) => {
   const jsonString = localStorage.getItem(Key);
   let listUsers = JSON.parse(jsonString);
-  console.log(listUsers);
   if (!listUsers) {
     listUsers = [];
   }
